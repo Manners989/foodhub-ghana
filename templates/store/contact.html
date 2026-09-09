@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Contact Us — {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-cream">
+  <div class="container text-center">
+    <span class="section-eyebrow d-inline-flex">Get in touch</span>
+    <h1 class="section-title">We'd love to hear from you</h1>
+    <p class="text-muted">Questions, feedback, or partnership ideas — send us a message and our team will respond within 24 hours.</p>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="d-flex gap-3 mb-4">
+          <div class="icon-btn flex-shrink-0" style="background:var(--fh-cream);color:var(--fh-primary)"><i class="bi bi-geo-alt"></i></div>
+          <div><h6 class="fw-bold mb-1">Our Location</h6><p class="text-muted mb-0 small">Osu, Accra, Ghana</p></div>
+        </div>
+        <div class="d-flex gap-3 mb-4">
+          <div class="icon-btn flex-shrink-0" style="background:var(--fh-cream);color:var(--fh-primary)"><i class="bi bi-telephone"></i></div>
+          <div><h6 class="fw-bold mb-1">Call Us</h6><p class="text-muted mb-0 small">+233 20 000 0000</p></div>
+        </div>
+        <div class="d-flex gap-3 mb-4">
+          <div class="icon-btn flex-shrink-0" style="background:var(--fh-cream);color:var(--fh-primary)"><i class="bi bi-envelope"></i></div>
+          <div><h6 class="fw-bold mb-1">Email Us</h6><p class="text-muted mb-0 small">hello@foodhub.gh</p></div>
+        </div>
+        <div class="d-flex gap-3">
+          <div class="icon-btn flex-shrink-0" style="background:var(--fh-cream);color:var(--fh-primary)"><i class="bi bi-clock"></i></div>
+          <div><h6 class="fw-bold mb-1">Working Hours</h6><p class="text-muted mb-0 small">Daily, 8:00 AM – 11:00 PM</p></div>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="bg-white rounded-4 shadow-sm p-4 p-md-5">
+          <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Your Name</label>
+                {{ form.name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Email</label>
+                {{ form.email }}
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-bold">Subject</label>
+                {{ form.subject }}
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-bold">Message</label>
+                {{ form.message }}
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-accent">Send Message <i class="bi bi-send ms-1"></i></button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% load static %}
+<div class="food-card">
+  <a href="{{ item.get_absolute_url }}" class="text-decoration-none">
+    <div class="food-img-wrap">
+      {% if item.has_discount %}<span class="badge-discount">-{{ item.discount_percent }}%</span>{% endif %}
+      {% if item.is_vegetarian %}<span class="badge-veg"><i class="bi bi-leaf-fill"></i></span>{% endif %}
+      {% if item.display_image %}
+        <img src="{{ item.display_image }}" alt="{{ item.name }}" loading="lazy">
+      {% else %}
+        <div class="no-img"><i class="bi bi-image"></i></div>
+      {% endif %}
+    </div>
+  </a>
+  <div class="food-card-body">
+    <div class="food-cat">{{ item.category.name }}</div>
+    <a href="{{ item.get_absolute_url }}" class="text-decoration-none">
+      <div class="food-name">{{ item.name }}</div>
+    </a>
+    <div class="rating-stars mb-2">
+      {% if item.review_count %}
+        <i class="bi bi-star-fill"></i> {{ item.average_rating }} <span class="text-muted">({{ item.review_count }})</span>
+      {% else %}
+        <span class="text-muted small">No reviews yet</span>
+      {% endif %}
+    </div>
+    <p class="food-desc">{{ item.description|truncatewords:10 }}</p>
+    <div class="food-footer">
+      <div>
+        {% if item.has_discount %}<span class="price-old">GH₵{{ item.price }}</span>{% endif %}
+        <span class="price-tag">GH₵{{ item.current_price }}</span>
+      </div>
+      <form class="ajax-add-form" action="{% url 'store:cart_add' item.slug %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="quantity" value="1">
+        <button type="submit" class="add-btn" title="Add to cart"><i class="bi bi-plus-lg"></i></button>
+      </form>
+    </div>
+  </div>
+</div>

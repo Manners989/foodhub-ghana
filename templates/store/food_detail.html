@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ item.name }} — {{ site_name }}{% endblock %}
+{% block meta_description %}{{ item.description|truncatewords:20 }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'store:home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'store:menu' %}">Menu</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'store:menu' %}?category={{ item.category.slug }}">{{ item.category.name }}</a></li>
+        <li class="breadcrumb-item active">{{ item.name }}</li>
+      </ol>
+    </nav>
+
+    <div class="row g-5">
+      <div class="col-lg-6">
+        <div class="detail-image">
+          {% if item.display_image %}
+            <img src="{{ item.display_image }}" alt="{{ item.name }}">
+          {% else %}
+            <div class="d-flex align-items-center justify-content-center h-100"><i class="bi bi-image" style="font-size:4rem;color:#ccc"></i></div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <span class="food-cat">{{ item.category.name }}</span>
+        <h1 class="section-title mt-1">{{ item.name }}</h1>
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="rating-stars">
+            <i class="bi bi-star-fill"></i> {{ item.average_rating }} <span class="text-muted">({{ item.review_count }} review{{ item.review_count|pluralize }})</span>
+          </div>
+          {% if item.is_vegetarian %}<span class="badge" style="background:var(--fh-green)">Vegetarian</span>{% endif %}
+        </div>
+        <p class="text-muted">{{ item.description }}</p>
+
+        <div class="d-flex align-items-center gap-4 my-4 flex-wrap">
+          <div>
+            <div class="small text-muted">Price</div>
+            {% if item.has_discount %}<span class="price-old">GH₵{{ item.price }}</span>{% endif %}
+            <span class="price-tag fs-3">GH₵{{ item.current_price }}</span>
+          </div>
+          <div>
+            <div class="small text-muted">Prep time</div>
+            <div class="fw-bold"><i class="bi bi-clock text-accent"></i> {{ item.prep_time_minutes }} mins</div>
+          </div>
+          {% if item.calories %}
+          <div>
+            <div class="small text-muted">Calories</div>
+            <div class="fw-bold"><i class="bi bi-fire text-accent"></i> {{ item.calories }} kcal</div>
+          </div>
+          {% endif %}
+          <div>
+            <div class="small text-muted">Spice level</div>
+            <div>
+              {% for i in "01234" %}
+                <span class="spice-dot {% if forloop.counter0 <= item.spice_level %}active{% endif %}"></span>
+              {% endfor %}
+              <span class="small text-muted">{{ item.get_spice_level_display }}</span>
+            </div>
+          </div>
+        </div>
+
+        <form class="ajax-add-form d-flex align-items-center gap-3" action="{% url 'store:cart_add' item.slug %}" method="post">
+          {% csrf_token %}
+          <div class="qty-selector">
+            <button type="button" data-action="dec">−</button>
+            <input type="text" name="quantity" value="1" readonly>
+            <button type="button" data-action="inc">+</button>
+          </div>
+          <button type="submit" class="btn btn-accent flex-grow-1"><i class="bi bi-basket3 me-2"></i>Add to Cart</button>
+        </form>
+
+        <div class="d-flex gap-4 mt-4 text-muted small">
+          <div><i class="bi bi-shield-check text-accent"></i> Freshly prepared</div>
+          <div><i class="bi bi-truck text-accent"></i> Fast delivery</div>
+          <div><i class="bi bi-arrow-repeat text-accent"></i> Easy reorder</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="row mt-5 pt-4 border-top">
+      <div class="col-lg-8">
+        <h4 class="fw-bold mb-4">Customer Reviews ({{ item.review_count }})</h4>
+
+        {% if user.is_authenticated %}
+        <div class="bg-cream rounded-4 p-4 mb-4">
+          <h6 class="fw-bold mb-3">{% if user_review %}Update your review{% else %}Leave a review{% endif %}</h6>
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <div class="star-rating-picker fs-4 d-inline-block">
+                {% for i in rating_range %}
+                <i class="bi {% if user_review and i <= user_review.rating %}bi-star-fill{% else %}bi-star{% endif %}" data-value="{{ i }}" style="cursor:pointer;color:var(--fh-accent)"></i>
+                {% endfor %}
+              </div>
+              <div class="d-none">{{ review_form.rating }}</div>
+            </div>
+            {{ review_form.comment }}
+            <button type="submit" class="btn btn-accent mt-3">{% if user_review %}Update Review{% else %}Submit Review{% endif %}</button>
+          </form>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+          <a href="{% url 'accounts:login' %}?next={{ request.path }}">Log in</a> to leave a review.
+        </div>
+        {% endif %}
+
+        {% for review in reviews %}
+        <div class="d-flex gap-3 mb-4 pb-4 border-bottom">
+          <div class="rounded-circle bg-cream d-flex align-items-center justify-content-center flex-shrink-0" style="width:48px;height:48px;">
+            <i class="bi bi-person-fill text-accent fs-4"></i>
+          </div>
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fw-bold">{{ review.user.first_name|default:review.user.username }}</span>
+              <span class="rating-stars small"><i class="bi bi-star-fill"></i> {{ review.rating }}/5</span>
+            </div>
+            <div class="small text-muted mb-1">{{ review.created_at|date:"M d, Y" }}</div>
+            <p class="mb-0">{{ review.comment }}</p>
+          </div>
+        </div>
+        {% empty %}
+        <p class="text-muted">Be the first to review this dish!</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- RELATED -->
+    {% if related %}
+    <div class="mt-5 pt-4 border-top">
+      <h4 class="fw-bold mb-4">You might also like</h4>
+      <div class="row g-4">
+        {% for r in related %}
+        <div class="col-md-6 col-lg-3">
+          {% include "store/partials/food_card.html" with item=r %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

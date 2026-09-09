@@ -1,0 +1,183 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{{ site_name }} — Ghana's Favourite Food Delivery{% endblock %}</title>
+<meta name="description" content="{% block meta_description %}Order delicious local and continental meals online in Ghana. Fast delivery, Mobile Money payments, and unbeatable taste.{% endblock %}">
+
+<link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet">
+
+<!-- Bootstrap 5 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+<div class="topbar d-none d-md-block">
+  <div class="container d-flex justify-content-between align-items-center">
+    <div class="topbar-item"><i class="bi bi-geo-alt-fill"></i> Delivering across Accra, Kumasi &amp; beyond</div>
+    <div class="d-flex gap-4">
+      <span class="topbar-item"><i class="bi bi-telephone-fill"></i> +233 20 000 0000</span>
+      <span class="topbar-item"><i class="bi bi-clock-fill"></i> Open daily · 8am – 11pm</span>
+    </div>
+  </div>
+</div>
+
+<nav class="navbar navbar-expand-lg sticky-top main-nav">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'store:home' %}">
+      <span class="brand-mark"><i class="bi bi-egg-fried"></i></span>
+      <span class="brand-text">Food<span class="text-accent">Hub</span></span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav mx-auto gap-lg-2">
+        <li class="nav-item"><a class="nav-link" href="{% url 'store:home' %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'store:menu' %}">Menu</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Categories</a>
+          <ul class="dropdown-menu shadow-lg border-0 rounded-3">
+            {% for cat in nav_categories %}
+            <li><a class="dropdown-item" href="{% url 'store:menu' %}?category={{ cat.slug }}"><i class="bi {{ cat.icon|default:'bi-tag' }} me-2 text-accent"></i>{{ cat.name }}</a></li>
+            {% empty %}
+            <li><span class="dropdown-item-text text-muted small">No categories yet</span></li>
+            {% endfor %}
+          </ul>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'store:about' %}">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'store:contact' %}">Contact</a></li>
+      </ul>
+      <div class="d-flex align-items-center gap-2">
+        <form action="{% url 'store:menu' %}" method="get" class="nav-search d-none d-lg-flex">
+          <input type="search" name="q" class="form-control" placeholder="Search for jollof, waakye..." value="{{ query|default:'' }}">
+          <button type="submit"><i class="bi bi-search"></i></button>
+        </form>
+        {% if user.is_authenticated %}
+        <div class="dropdown">
+          <a href="#" class="icon-btn" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i></a>
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3">
+            <li><span class="dropdown-item-text fw-semibold">Hi, {{ user.first_name|default:user.username }}</span></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="bi bi-person me-2"></i>My Profile</a></li>
+            <li><a class="dropdown-item" href="{% url 'store:order_history' %}"><i class="bi bi-bag-check me-2"></i>My Orders</a></li>
+            {% if user.is_staff %}<li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="bi bi-speedometer2 me-2"></i>Admin Panel</a></li>{% endif %}
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form action="{% url 'accounts:logout' %}" method="post" class="px-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger w-100">Logout</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+        {% else %}
+        <a href="{% url 'accounts:login' %}" class="icon-btn d-none d-md-inline-flex" title="Login"><i class="bi bi-person"></i></a>
+        {% endif %}
+        <a href="{% url 'store:cart_detail' %}" class="icon-btn cart-btn" title="Cart">
+          <i class="bi bi-basket3"></i>
+          <span class="cart-badge" id="cart-count">{{ nav_cart_count|default:0 }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+{% if messages %}
+<div class="toast-stack">
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<main>
+{% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <a class="navbar-brand mb-3 d-inline-block" href="{% url 'store:home' %}">
+          <span class="brand-mark"><i class="bi bi-egg-fried"></i></span>
+          <span class="brand-text text-white">Food<span class="text-accent">Hub</span></span>
+        </a>
+        <p class="text-white-50">Authentic Ghanaian and continental dishes, cooked fresh and delivered fast — right to your doorstep.</p>
+        <div class="d-flex gap-2">
+          <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" class="social-btn"><i class="bi bi-whatsapp"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-6">
+        <h6 class="footer-heading">Explore</h6>
+        <ul class="footer-links">
+          <li><a href="{% url 'store:home' %}">Home</a></li>
+          <li><a href="{% url 'store:menu' %}">Full Menu</a></li>
+          <li><a href="{% url 'store:about' %}">About Us</a></li>
+          <li><a href="{% url 'store:contact' %}">Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-6">
+        <h6 class="footer-heading">Categories</h6>
+        <ul class="footer-links">
+          {% for cat in nav_categories|slice:":5" %}
+          <li><a href="{% url 'store:menu' %}?category={{ cat.slug }}">{{ cat.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-lg-4">
+        <h6 class="footer-heading">Stay in the loop</h6>
+        <p class="text-white-50">Get news on new dishes and special offers.</p>
+        <form class="newsletter-form" id="newsletter-form" action="{% url 'store:newsletter_signup' %}" method="post">
+          {% csrf_token %}
+          <input type="email" name="email" class="form-control" placeholder="Your email address" required>
+          <button type="submit" class="btn btn-accent">Subscribe</button>
+        </form>
+        <div class="small mt-2 text-white-50">
+          <i class="bi bi-geo-alt me-1"></i> Osu, Accra, Ghana &nbsp;
+          <i class="bi bi-envelope ms-2 me-1"></i> hello@foodhub.gh
+        </div>
+      </div>
+    </div>
+    <hr class="border-secondary my-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between text-white-50 small gap-2">
+      <div>&copy; {% now "Y" %} FoodHub Ghana. All rights reserved.</div>
+      <div class="d-flex gap-3">
+        <span><i class="bi bi-wallet2 me-1"></i>MTN MoMo · Telecel Cash · AirtelTigo</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<a href="{% url 'store:cart_detail' %}" class="mobile-cart-fab d-lg-none">
+  <i class="bi bi-basket3"></i>
+  <span class="cart-badge" id="cart-count-mobile">{{ nav_cart_count|default:0 }}</span>
+</a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script>
+  window.FOODHUB = {
+    csrfToken: "{{ csrf_token }}",
+  };
+</script>
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

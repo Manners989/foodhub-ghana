@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Login — {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="auth-wrapper">
+  <div class="container">
+    <div class="auth-card row g-0 mx-auto" style="max-width: 900px;">
+      <div class="col-md-5 auth-side d-none d-md-flex">
+        <i class="bi bi-egg-fried fs-1 mb-3"></i>
+        <h3 class="fw-bold">Welcome back!</h3>
+        <p class="text-white-75">Log in to track your orders, save your favourite dishes, and check out faster.</p>
+      </div>
+      <div class="col-md-7">
+        <div class="p-4 p-md-5">
+          <h3 class="fw-bold mb-1">Log In</h3>
+          <p class="text-muted mb-4">Enter your details to access your account.</p>
+
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Username</label>
+              {{ form.username }}
+              {{ form.username.errors }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Password</label>
+              {{ form.password }}
+              {{ form.password.errors }}
+            </div>
+            <button type="submit" class="btn btn-accent w-100">Log In</button>
+          </form>
+          <p class="text-center mt-4 mb-0 small">Don't have an account? <a href="{% url 'accounts:register' %}" class="text-accent fw-bold">Sign up</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

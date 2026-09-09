@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Sign Up — {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="auth-wrapper">
+  <div class="container">
+    <div class="auth-card row g-0 mx-auto" style="max-width: 1000px;">
+      <div class="col-md-5 auth-side d-none d-md-flex">
+        <i class="bi bi-egg-fried fs-1 mb-3"></i>
+        <h3 class="fw-bold">Join FoodHub today</h3>
+        <p class="text-white-75">Create an account to track orders, save delivery details, and enjoy a faster checkout every time.</p>
+      </div>
+      <div class="col-md-7">
+        <div class="p-4 p-md-5">
+          <h3 class="fw-bold mb-1">Create Account</h3>
+          <p class="text-muted mb-4">It only takes a minute.</p>
+
+          <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">First Name</label>
+                {{ form.first_name }}
+                {{ form.first_name.errors }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Last Name</label>
+                {{ form.last_name }}
+                {{ form.last_name.errors }}
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-bold">Username</label>
+                {{ form.username }}
+                {{ form.username.errors }}
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-bold">Email</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-bold">Phone Number</label>
+                {{ form.phone_number }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Password</label>
+                {{ form.password1 }}
+                {{ form.password1.errors }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Confirm Password</label>
+                {{ form.password2 }}
+                {{ form.password2.errors }}
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-accent w-100">Create Account</button>
+              </div>
+            </div>
+          </form>
+          <p class="text-center mt-4 mb-0 small">Already have an account? <a href="{% url 'accounts:login' %}" class="text-accent fw-bold">Log in</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

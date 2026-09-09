@@ -1,0 +1,1 @@
+web: gunicorn foodhub.wsgi:application

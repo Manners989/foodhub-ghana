@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}My Orders — {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <h1 class="section-title mb-4">My Orders</h1>
+
+    {% if orders %}
+    <div class="table-responsive bg-white rounded-4 shadow-sm p-3">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr class="text-muted small text-uppercase">
+            <th>Order #</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+          <tr>
+            <td class="fw-bold">{{ order.order_number }}</td>
+            <td>{{ order.created_at|date:"M d, Y" }}</td>
+            <td>{{ order.items.count }} item{{ order.items.count|pluralize }}</td>
+            <td>GH₵{{ order.total|floatformat:2 }}</td>
+            <td>
+              <span class="badge
+                {% if order.status == 'delivered' %}bg-success
+                {% elif order.status == 'cancelled' %}bg-danger
+                {% else %}bg-warning text-dark{% endif %}">
+                {{ order.get_status_display }}
+              </span>
+            </td>
+            <td><a href="{% url 'store:order_detail' order.order_number %}" class="btn btn-sm btn-outline-accent">Track</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="bi bi-bag"></i>
+      <h4>No orders yet</h4>
+      <p class="text-muted">Your order history will show up here once you place an order.</p>
+      <a href="{% url 'store:menu' %}" class="btn btn-accent mt-2">Browse the Menu</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

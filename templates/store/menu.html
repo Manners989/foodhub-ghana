@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Our Menu — {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-cream">
+  <div class="container text-center">
+    <span class="section-eyebrow d-inline-flex">Full menu</span>
+    <h1 class="section-title">Find your next favourite meal</h1>
+    <form action="{% url 'store:menu' %}" method="get" class="hero-search mx-auto mt-4">
+      <i class="bi bi-search ms-2 text-muted"></i>
+      <input type="search" name="q" placeholder="Search dishes..." value="{{ query }}">
+      <button type="submit" class="btn btn-accent">Search</button>
+    </form>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-3">
+        <form method="get" class="filter-panel">
+          {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+          <h6 class="fw-bold mb-3">Categories</h6>
+          <div class="mb-4">
+            <a href="?{% if query %}q={{ query }}&{% endif %}" class="filter-chip {% if not category_slug %}active{% endif %}">All</a>
+            {% for cat in categories %}
+            <a href="?{% if query %}q={{ query }}&{% endif %}category={{ cat.slug }}" class="filter-chip {% if category_slug == cat.slug %}active{% endif %}">{{ cat.name }}</a>
+            {% endfor %}
+          </div>
+
+          <h6 class="fw-bold mb-2">Max price (GH₵)</h6>
+          <input type="number" name="max_price" class="form-control mb-4" placeholder="e.g. 60" value="{{ max_price }}" min="0">
+
+          <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" name="veg" value="1" id="vegCheck" {% if veg_only %}checked{% endif %}>
+            <label class="form-check-label" for="vegCheck">Vegetarian only</label>
+          </div>
+
+          <h6 class="fw-bold mb-2">Sort by</h6>
+          <select name="sort" class="form-select mb-4">
+            <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+            <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+            <option value="name" {% if sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+          </select>
+
+          <button type="submit" class="btn btn-accent w-100">Apply Filters</button>
+          <a href="{% url 'store:menu' %}" class="btn btn-outline-accent w-100 mt-2">Reset</a>
+        </form>
+      </div>
+
+      <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+          <div class="text-muted">
+            {% if query %}Results for "<strong>{{ query }}</strong>" — {% endif %}
+            {{ result_count }} dish{{ result_count|pluralize }} found
+          </div>
+        </div>
+
+        {% if page_obj.object_list %}
+        <div class="row g-4">
+          {% for item in page_obj %}
+          <div class="col-md-6 col-xl-4 reveal in-view">
+            {% include "store/partials/food_card.html" with item=item %}
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <nav class="mt-5">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}">Previous</a></li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+              <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}">Next</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="empty-state">
+          <i class="bi bi-emoji-frown"></i>
+          <h4>No dishes found</h4>
+          <p class="text-muted">Try a different search term or clear your filters.</p>
+          <a href="{% url 'store:menu' %}" class="btn btn-accent mt-2">Clear filters</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

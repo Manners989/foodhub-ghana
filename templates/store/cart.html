@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Your Cart — {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <h1 class="section-title mb-4">Your Cart</h1>
+
+    {% if cart.items.all %}
+    <div class="row g-4">
+      <div class="col-lg-8">
+        {% if cart.subtotal < free_delivery_threshold %}
+        <div class="alert alert-info d-flex align-items-center gap-2">
+          <i class="bi bi-truck fs-5"></i>
+          Spend up to <strong>GH₵{{ free_delivery_threshold|floatformat:2 }}</strong> to unlock free delivery!
+        </div>
+        {% endif %}
+
+        {% for ci in cart.items.all %}
+        <div class="cart-line">
+          {% if ci.food_item.display_image %}
+          <img src="{{ ci.food_item.display_image }}" alt="{{ ci.food_item.name }}">
+          {% else %}
+          <div style="width:84px;height:84px;background:#f4f2f0;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+            <i class="bi bi-image text-muted"></i>
+          </div>
+          {% endif %}
+          <div class="flex-grow-1">
+            <a href="{{ ci.food_item.get_absolute_url }}" class="text-decoration-none text-dark"><div class="fw-bold">{{ ci.food_item.name }}</div></a>
+            <div class="text-muted small">GH₵{{ ci.food_item.current_price }} each</div>
+          </div>
+          <form class="cart-qty-form" action="{% url 'store:cart_update' ci.id %}" method="post">
+            {% csrf_token %}
+            <div class="qty-selector">
+              <button type="button" data-action="dec">−</button>
+              <input type="text" name="quantity" value="{{ ci.quantity }}" readonly>
+              <button type="button" data-action="inc">+</button>
+            </div>
+          </form>
+          <div class="fw-bold" style="min-width:90px; text-align:right;">GH₵{{ ci.line_total|floatformat:2 }}</div>
+          <form action="{% url 'store:cart_remove' ci.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-trash"></i></button>
+          </form>
+        </div>
+        {% endfor %}
+
+        <a href="{% url 'store:menu' %}" class="btn btn-outline-accent mt-3"><i class="bi bi-arrow-left me-1"></i> Continue Shopping</a>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="summary-card">
+          <h5 class="fw-bold mb-4">Order Summary</h5>
+          <div class="d-flex justify-content-between mb-2"><span class="text-muted">Subtotal</span><span>GH₵{{ cart.subtotal|floatformat:2 }}</span></div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Delivery Fee</span>
+            <span>{% if delivery_fee == 0 %}<span class="text-success fw-bold">FREE</span>{% else %}GH₵{{ delivery_fee|floatformat:2 }}{% endif %}</span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between mb-4 fs-5 fw-bold"><span>Total</span><span>GH₵{{ total|floatformat:2 }}</span></div>
+          <a href="{% url 'store:checkout' %}" class="btn btn-accent w-100">Proceed to Checkout <i class="bi bi-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="bi bi-basket3"></i>
+      <h4>Your cart is empty</h4>
+      <p class="text-muted">Looks like you haven't added anything yet.</p>
+      <a href="{% url 'store:menu' %}" class="btn btn-accent mt-2">Browse the Menu</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

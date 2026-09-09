@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Track Order {{ order.order_number }} — {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <h1 class="section-title mb-1">Order {{ order.order_number }}</h1>
+    <p class="text-muted">Placed on {{ order.created_at|date:"M d, Y — g:i A" }}</p>
+
+    {% if order.status == 'cancelled' %}
+    <div class="alert alert-danger mt-4"><i class="bi bi-x-circle me-2"></i>This order has been cancelled.</div>
+    {% else %}
+    <div class="order-progress mt-5">
+      <div class="progress-fill" style="width: {{ order.status_progress }}%"></div>
+      <div class="step {% if order.status_progress >= 0 %}done{% endif %}">
+        <div class="step-icon"><i class="bi bi-receipt"></i></div>
+        <div class="step-label">Pending</div>
+      </div>
+      <div class="step {% if order.status_progress >= 25 %}done{% endif %}">
+        <div class="step-icon"><i class="bi bi-check2"></i></div>
+        <div class="step-label">Confirmed</div>
+      </div>
+      <div class="step {% if order.status_progress >= 50 %}done{% endif %}">
+        <div class="step-icon"><i class="bi bi-fire"></i></div>
+        <div class="step-label">Preparing</div>
+      </div>
+      <div class="step {% if order.status_progress >= 75 %}done{% endif %}">
+        <div class="step-icon"><i class="bi bi-bicycle"></i></div>
+        <div class="step-label">Out for Delivery</div>
+      </div>
+      <div class="step {% if order.status_progress >= 100 %}done{% endif %}">
+        <div class="step-icon"><i class="bi bi-house-check"></i></div>
+        <div class="step-label">Delivered</div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4 mt-2">
+      <div class="col-lg-7">
+        <div class="bg-white rounded-4 shadow-sm p-4 mb-4">
+          <h5 class="fw-bold mb-3">Items</h5>
+          {% for oi in order.items.all %}
+          <div class="d-flex justify-content-between mb-2">
+            <span>{{ oi.quantity }} × {{ oi.food_name }}</span>
+            <span>GH₵{{ oi.line_total|floatformat:2 }}</span>
+          </div>
+          {% endfor %}
+          <hr>
+          <div class="d-flex justify-content-between mb-1"><span class="text-muted">Subtotal</span><span>GH₵{{ order.subtotal|floatformat:2 }}</span></div>
+          <div class="d-flex justify-content-between mb-1"><span class="text-muted">Delivery Fee</span><span>{% if order.delivery_fee == 0 %}FREE{% else %}GH₵{{ order.delivery_fee|floatformat:2 }}{% endif %}</span></div>
+          <div class="d-flex justify-content-between fs-5 fw-bold mt-2"><span>Total</span><span>GH₵{{ order.total|floatformat:2 }}</span></div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="bg-white rounded-4 shadow-sm p-4">
+          <h5 class="fw-bold mb-3">Delivery Details</h5>
+          <div class="mb-2"><span class="text-muted small">Status</span><br><span class="badge bg-dark">{{ order.get_status_display }}</span></div>
+          <div class="mb-2"><span class="text-muted small">Recipient</span><br>{{ order.full_name }} · {{ order.phone_number }}</div>
+          {% if order.delivery_type == 'delivery' %}
+          <div class="mb-2"><span class="text-muted small">Address</span><br>{{ order.address }}, {{ order.city }}, {{ order.region }}</div>
+          {% if order.landmark %}<div class="mb-2"><span class="text-muted small">Landmark</span><br>{{ order.landmark }}</div>{% endif %}
+          {% else %}
+          <div class="mb-2"><span class="text-muted small">Delivery Method</span><br>Self Pickup</div>
+          {% endif %}
+          <div class="mb-2"><span class="text-muted small">Payment</span><br>{{ order.get_payment_method_display }}{% if order.momo_network %} ({{ order.momo_network }}){% endif %}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

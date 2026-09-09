@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="hero-badge animate__animated animate__fadeInDown"><i class="bi bi-lightning-charge-fill"></i> Delivered in 30 minutes or less</span>
+        <h1 class="mt-3 animate__animated animate__fadeInUp">Craving something <span class="text-accent">delicious</span> right now?</h1>
+        <p class="lead mt-3 animate__animated animate__fadeInUp">From smoky jollof to juicy grilled chicken — order your favourite meals and get them delivered hot, fresh, and fast, anywhere in Ghana.</p>
+        <form action="{% url 'store:menu' %}" method="get" class="hero-search animate__animated animate__fadeInUp">
+          <i class="bi bi-search ms-2 text-muted"></i>
+          <input type="search" name="q" placeholder="Search 'jollof', 'waakye', 'pizza'...">
+          <button type="submit" class="btn btn-accent">Search</button>
+        </form>
+        <div class="hero-stats">
+          <div><div class="stat-num">12k+</div><div class="stat-label">Happy customers</div></div>
+          <div><div class="stat-num">4.8<i class="bi bi-star-fill text-accent" style="font-size:1rem"></i></div><div class="stat-label">Average rating</div></div>
+          <div><div class="stat-num">150+</div><div class="stat-label">Dishes on offer</div></div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="hero-visual text-center position-relative">
+          <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&q=80" alt="Delicious food bowl" class="hero-plate">
+          <div class="floating-chip chip-1 animate__animated animate__fadeInLeft">
+            <i class="bi bi-truck"></i> <div><div style="font-size:.8rem;color:var(--fh-muted);font-weight:500">Free delivery</div>over GH₵150</div>
+          </div>
+          <div class="floating-chip chip-2 animate__animated animate__fadeInRight">
+            <i class="bi bi-patch-check-fill"></i> <div><div style="font-size:.8rem;color:var(--fh-muted);font-weight:500">Verified</div>fresh ingredients</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3 reveal">
+      <div>
+        <span class="section-eyebrow">Browse</span>
+        <h2 class="section-title">Shop by category</h2>
+      </div>
+      <a href="{% url 'store:menu' %}" class="btn btn-outline-accent">View full menu <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="category-scroller reveal">
+      {% for cat in categories %}
+      <a href="{% url 'store:menu' %}?category={{ cat.slug }}" class="category-card text-decoration-none">
+        <div class="cat-icon"><i class="bi {{ cat.icon|default:'bi-egg-fried' }}"></i></div>
+        <div class="cat-name">{{ cat.name }}</div>
+      </a>
+      {% empty %}
+      <div class="text-muted">Categories will appear here once added in the admin panel.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED -->
+{% if featured %}
+<section class="py-4 bg-cream">
+  <div class="container py-4">
+    <div class="mb-4 reveal">
+      <span class="section-eyebrow">Chef's picks</span>
+      <h2 class="section-title">Featured this week</h2>
+    </div>
+    <div class="row g-4">
+      {% for item in featured %}
+      <div class="col-lg-3 col-md-6 reveal">
+        {% include "store/partials/food_card.html" with item=item %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- OFFER BANNER -->
+<section class="py-5">
+  <div class="container">
+    <div class="offer-banner reveal">
+      <div class="row align-items-center position-relative" style="z-index:1">
+        <div class="col-lg-7">
+          <span class="badge bg-accent text-dark fw-bold mb-3" style="background:var(--fh-accent)">LIMITED OFFER</span>
+          <h2 class="text-white fw-bold display-font" style="font-size:2.2rem;">Free delivery on orders above GH₵150</h2>
+          <p class="text-white-50 mb-4">No promo code needed — the discount applies automatically at checkout on qualifying orders.</p>
+          <a href="{% url 'store:menu' %}" class="btn btn-accent">Order Now <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="col-lg-5 text-center d-none d-lg-block">
+          <i class="bi bi-bicycle" style="font-size:9rem;color:rgba(255,255,255,0.15)"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POPULAR -->
+{% if popular %}
+<section class="py-4">
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4 reveal">
+      <div>
+        <span class="section-eyebrow">Trending</span>
+        <h2 class="section-title">Popular right now</h2>
+      </div>
+      <a href="{% url 'store:menu' %}" class="btn btn-outline-accent">See all <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-4">
+      {% for item in popular %}
+      <div class="col-lg-3 col-md-6 reveal">
+        {% include "store/partials/food_card.html" with item=item %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- HOW IT WORKS -->
+<section class="py-5 bg-cream">
+  <div class="container py-4">
+    <div class="text-center mb-5 reveal">
+      <span class="section-eyebrow d-inline-flex">How it works</span>
+      <h2 class="section-title">Getting your food is this easy</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-3 col-6 reveal">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h6 class="fw-bold">Browse the menu</h6>
+          <p class="text-muted small mb-0">Explore dishes by category or search for a craving.</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 reveal">
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h6 class="fw-bold">Add to cart</h6>
+          <p class="text-muted small mb-0">Pick your favourites and customize your order.</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 reveal">
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h6 class="fw-bold">Checkout &amp; pay</h6>
+          <p class="text-muted small mb-0">Pay with Mobile Money, card, or cash on delivery.</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 reveal">
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <h6 class="fw-bold">Track &amp; enjoy</h6>
+          <p class="text-muted small mb-0">Watch your order status update in real time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="py-5">
+  <div class="container py-4">
+    <div class="text-center mb-5 reveal">
+      <span class="section-eyebrow d-inline-flex">Testimonials</span>
+      <h2 class="section-title">What our customers say</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-4 reveal">
+        <div class="testimonial-card">
+          <div class="stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+          <p>"The jollof tasted just like homemade! Delivery was fast and the rider was very polite."</p>
+          <div class="d-flex align-items-center gap-2 mt-3">
+            <img src="https://i.pravatar.cc/80?img=32" class="testimonial-avatar" alt="Customer">
+            <div><div class="fw-bold">Ama Serwaa</div><div class="small text-muted">Accra</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 reveal">
+        <div class="testimonial-card">
+          <div class="stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+          <p>"Paying with MoMo was seamless and I could track my order the whole way. Big fan!"</p>
+          <div class="d-flex align-items-center gap-2 mt-3">
+            <img src="https://i.pravatar.cc/80?img=12" class="testimonial-avatar" alt="Customer">
+            <div><div class="fw-bold">Kwabena Owusu</div><div class="small text-muted">Kumasi</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 reveal">
+        <div class="testimonial-card">
+          <div class="stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i></div>
+          <p>"Great variety of local and continental dishes. My go-to for lunch orders at the office."</p>
+          <div class="d-flex align-items-center gap-2 mt-3">
+            <img src="https://i.pravatar.cc/80?img=47" class="testimonial-avatar" alt="Customer">
+            <div><div class="fw-bold">Efua Mensah</div><div class="small text-muted">Takoradi</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

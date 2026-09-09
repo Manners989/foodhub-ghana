@@ -1,0 +1,12 @@
+# Extra requirement for running against PostgreSQL instead of SQLite.
+# Install this ONLY when you actually need Postgres — it requires either a
+# prebuilt wheel for your Python version/OS, or PostgreSQL's dev headers
+# (pg_config) to compile from source.
+#
+#   pip install -r requirements.txt -r requirements-postgres.txt
+#
+# This is installed automatically inside the Docker image (see Dockerfile),
+# since the Docker setup always uses Postgres. You will NOT need this file
+# for local development with the default SQLite database.
+
+psycopg2-binary==2.9.10
